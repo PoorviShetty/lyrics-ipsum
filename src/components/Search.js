@@ -3,46 +3,48 @@ import axios from "axios"
 
 function Search() {
     const [artist, setArtist] = useState('');
-    const [data, setData] = useState('')
     const [result, setResult] = useState('')
-    const [artistId, setArtistId] = useState('')
-    const [track, setTrack] = useState('')
 
     function handleChange(e){
         setArtist(e.target.value)
     }
 
+    async function getData(url) {
+        try {
+           let res = await axios({
+                url: url,
+                method: 'get',
+                timeout: 8000,
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })   
+            return res.data
+        }
+        catch (err) {
+            console.error(err);
+        }
+    }
     function handleSubmit(e){
         const toSearch = e.target[0].value
-        axios
-        .get(`https://api.musixmatch.com/ws/1.1/artist.search?q_artist=${toSearch}&apikey=${process.env.REACT_APP_APIKEY}&page_size=5`, { crossDomain: true })
-        .then((response) => {
-            setData(response.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-        if (data){
-            setResult(data.message.body.artist_list)
-            console.log(result.length)
-        }
+        getData(`https://api.musixmatch.com/ws/1.1/artist.search?q_artist=${toSearch}&apikey=${process.env.REACT_APP_APIKEY}&page_size=1`)
+        .then(res => {
+            const artist_name = res.message.body.artist_list[0].artist.artist_name
+            getData(`https://api.musixmatch.com/ws/1.1/track.search?q_artist=${artist_name}&apikey=${process.env.REACT_APP_APIKEY}&page_size=1&page=1&s_track_rating=desc`)
+            .then(res => {
+                const track_info ={
+                    "artist_name": res.message.body.track_list[0].track.artist_name,
+                    "track_name": res.message.body.track_list[0].track.track_name,
+                }
 
+                getData(`https://api.musixmatch.com/ws/1.1/matcher.lyrics.get?q_track=${track_info['track_name']}&q_artist=${track_info['artist_name']}&apikey=${process.env.REACT_APP_APIKEY}`)
+                .then(res => {
+                    console.log(res.message.body.lyrics.lyrics_body)
+                    setResult(res.message.body.lyrics.lyrics_body)
+                })
+            })
+        })
         e.preventDefault();
-    }
-
-    function changeId(e){
-        setArtistId(e.target.name)
-        axios
-        .get(`https://api.musixmatch.com/ws/1.1/track.search?q_artist=${artistId}&apikey=${process.env.REACT_APP_APIKEY}&page_size=1&page=1&s_track_rating=desc`, { crossDomain: true })
-        .then((response) => {
-            setTrack(response.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-        console.log(track)
-        e.preventDefault();
-
     }
 
     return (
@@ -60,18 +62,8 @@ function Search() {
                     <button className="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-s leading-tight uppercase shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out" type="submit">Search</button>
                 </form>
             </div>
-            <div className='Results'>
-                {result  &&  result.map((artist) =>    
-                <>
-                    <p className='py-2'>{artist.artist.artist_name} &nbsp;
-                    <button className="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase shadow-md"
-                    onClick={changeId} name={artist.artist.artist_name}>Choose</button>
-                    </p>
-                </>  )}
-            </div>
-            <hr/>
             <div className='Lyrics'>
-                {artistId}
+                {result}
             </div>
         </>
 

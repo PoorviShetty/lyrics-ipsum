@@ -3,7 +3,7 @@ import axios from "axios"
 
 function Search() {
     const [artist, setArtist] = useState('');
-    const [result, setResult] = useState('')
+    const [result, setResult] = useState('Waiting for an artist!')
 
     function handleChange(e){
         setArtist(e.target.value)
@@ -49,21 +49,29 @@ function Search() {
 
     return (
         <>
-            <div className='Search'>
-                <form onSubmit={handleSubmit}>
-                    <input
-                        type="text"
-                        className="form-control px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                        placeholder="Who's your favourite artist?"
-                        name="artist-search"
-                        value={artist}
-                        onChange={handleChange}
-                    />
-                    <button className="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-s leading-tight uppercase shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out" type="submit">Search</button>
-                </form>
-            </div>
-            <div className='Lyrics'>
-                {result}
+            <div className='bg-slate-200 h-screen py-5'>
+                <div className="flex justify-center p-5">
+                    <div className="block rounded-lg shadow-lg bg-white max-w-xl text-center">
+                        <div className="py-3 px-6 border-b border-gray-300 bg-orange-200">
+                            <form onSubmit={handleSubmit}>
+                                <input
+                                    type="text"
+                                    className="form-control px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                                    placeholder="Who's your favourite artist?"
+                                    name="artist-search"
+                                    value={artist}
+                                    onChange={handleChange}
+                                />
+                                <button className="inline-block px-6 py-2.5 bg-orange-600 text-white font-medium text-s leading-tight uppercase shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out" type="submit">Search</button>
+                            </form>
+                        </div>
+                        <div className="p-6 bg-yellow-200">
+                            <p className="text-gray-700 text-base mb-4">
+                                {result}
+                            </p>
+                        </div>
+                    </div>
+                </div>                
             </div>
         </>
 
